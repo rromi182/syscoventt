@@ -1,0 +1,106 @@
+/*--------------------------------------------------------------*/
+/*ESTILOS ADICIONALES DASHBOARD*/
+/*--------------------------------------------------------------*/
+/* Header y Navbar sticky */
+.main-header,
+.content-header {
+    
+    top: 0;
+    z-index: 1030;
+}
+
+/* Footer sticky */
+.main-footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 1030;
+    background: white;
+}
+
+/* Contenido desplazable */
+.content-wrapper {
+    min-height: calc(100vh - 120px);
+}
+
+/* Estilos simplificados */
+.small-box {
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+    transition: all 0.3s ease;
+    background: white !important;
+}
+
+.small-box:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0,0,0,.15);
+}
+
+.small-box .icon {
+    opacity: 0.8;
+}
+
+.btn-hover {
+    transition: all 0.3s ease;
+    border-width: 2px;
+    font-weight: 500;
+    padding: 0.75rem 0.5rem;
+}
+
+.btn-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,.1);
+}
+
+.card {
+    border: 1px solid #e3e6f0;
+    box-shadow: 0 2px 4px rgba(0,0,0,.05);
+    border-radius: 0.5rem;
+}
+
+.card-header {
+    border-bottom: 1px solid #e3e6f0;
+    border-radius: 0.5rem 0.5rem 0 0 !important;
+}
+
+/* Scroll suave */
+.content {
+    scroll-behavior: smooth;
+}
+
+/*--------------------------------------------------------------*/
+/*Adicionales para formularios*/
+/*--------------------------------------------------------------*/
+.card-outline {
+    border-top: 3px solid;
+}
+.card-primary.card-outline {
+    border-top-color: #007bff;
+}
+.card-info.card-outline {
+    border-top-color: #17a2b8;
+}
+.table-sm td {
+    padding: 0.5rem;
+    border-top: none;
+    border-bottom: 1px solid #dee2e6;
+}
+
+
+/*--------------------------------------------------------------*/
+/*Adicionales para tabla articulos*/
+/*--------------------------------------------------------------*/
+.img-clickable {
+    transition: all 0.3s ease;
+    border: 2px solid #dee2e6;
+}
+
+.img-clickable:hover {
+    transform: scale(1.05);
+    border-color: #007bff;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+#imagenAmpliada {
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}

@@ -1,0 +1,24 @@
+# Crear archivo .gitignore para excluir archivos innecesarios
+# Crea un archivo llamado .gitignore en tu proyecto con este contenido:
+
+# WampServer
+/wamp64/
+*.log
+
+# Archivos de configuración sensibles
+Config.php
+database.php
+Conexion.php
+.env
+*.env
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Archivos temporales
+*.tmp
+*.temp
