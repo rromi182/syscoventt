@@ -41,7 +41,8 @@ class EmpleadosModel extends Query
                 INNER JOIN cargos c ON e.id_cargo = c.id_cargo
                 WHERE e.id_empleado = ? 
                 AND e.estado = 'ACTIVO'";
-        return $this->select($sql, [$id_empleado]);
+        // Asegúrate de pasar el parámetro como array
+    return $this->select($sql, [$id_empleado]);
     }
 
     // Obtener todos los empleados activos

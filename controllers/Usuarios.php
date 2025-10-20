@@ -99,6 +99,79 @@ class Usuarios extends Controller
         die();
     }
 
+    public function agregar()
+    {
+        $username = $_POST['username'];
+        $password = md5($_POST['password']);
+        $confirm_password = md5($_POST['confirm_password']);
+        $id_empleado = $_POST['id_empleado'];
+        $id_sucursal = $_POST['id_sucursal'];
+        $estado = 'ACTIVO';
+
+        if (empty($username) || empty($password) || empty($confirm_password) || empty($id_empleado) || empty($id_sucursal)) {
+            echo json_encode("Todos los campos son obligatorios.", JSON_UNESCAPED_UNICODE);
+            die();
+        } else if ($password != $confirm_password) {
+            echo json_encode("Las contraseñas no coinciden.", JSON_UNESCAPED_UNICODE);
+            die();
+        } else {
+
+            $foto = 'user-photo.png'; // Valor por defecto
+
+            if (isset($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
+                $archivo = $_FILES['foto'];
+                $extension = pathinfo($archivo['name'], PATHINFO_EXTENSION);
+                $extension = strtolower($extension);
+
+                // Validar extensión
+                $extensionesPermitidas = ['jpg', 'jpeg', 'png'];
+                if (in_array($extension, $extensionesPermitidas)) {
+                    // Validar tamaño (2MB)
+                    if ($archivo['size'] <= 2 * 1024 * 1024) {
+                        // Generar nombre único
+                        $foto = 'user_' . time() . '_' . uniqid() . '.' . $extension;
+                        $rutaDestino = 'assets/img/' . $foto;
+
+                        // Mover el archivo
+                        move_uploaded_file($archivo['tmp_name'], $rutaDestino);
+                    }
+                }
+            }
+
+            $data = $this->model->agregar($username, $password, $foto, $id_empleado, $id_sucursal, $estado);
+            if ($data == 'Ok') {
+                $msg = "Success";
+            } else {
+                $msg = "Error";
+            }
+        }
+
+        echo json_encode($msg, JSON_UNESCAPED_UNICODE);
+        die();
+    }
+
+    // Método para verificar si el username existe
+    public function verificarUsername()
+    {
+        if ($_POST && isset($_POST['username'])) {
+            $username = trim($_POST['username']);
+
+            if (empty($username)) {
+                echo json_encode(['existe' => false]);
+                die();
+            }
+
+            // Verificar si el username ya existe
+            $usuarioExistente = $this->model->getUsuarioPorUsername($username);
+
+            echo json_encode(['existe' => !empty($usuarioExistente)]);
+            die();
+        }
+
+        echo json_encode(['existe' => false]);
+        die();
+    }
+
     //cerrar sesión
     public function logout()
     {

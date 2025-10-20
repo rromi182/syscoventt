@@ -1,44 +1,47 @@
 let tblUsuarios;
-document.addEventListener("DOMContentLoaded", function(){
+
+document.addEventListener("DOMContentLoaded", function () {
+    // Inicializar DataTable
     tblUsuarios = $("#tblUsuarios").DataTable({
         "ajax": {
             "url": BASE_URL + "Usuarios/listar",
             "dataSrc": ""
         },
         "columns": [
-            {"data": "id_user"},
-            {"data": "username"},
+            { "data": "id_user" },
+            { "data": "username" },
             {
                 "data": "foto",
-                "render": function(data, type, row) {
+                "render": function (data, type, row) {
                     const ruta = data ? BASE_URL + "assets/img/" + data : BASE_URL + "assets/img/user-photo.png";
                     return `<img src="${ruta}" class="rounded-circle" style="width: 40px; height: 40px;">`;
                 },
                 "orderable": false,
                 "searchable": false
             },
-            {"data": "nombre_completo"},
-            {"data": "cargo"},
-            {"data": "sucursal"},
+            { "data": "nombre_completo" },
+            { "data": "cargo" },
+            { "data": "sucursal" },
             {
                 "data": "estado",
-                "render": function(data) {
+                "render": function (data) {
                     if (data === 'ACTIVO') {
                         return '<span class="badge badge-success">' + data + '</span>';
-                    } else{
+                    } else {
                         return '<span class="badge badge-warning">' + data + '</span>';
-                    } 
+                    }
                 }
             },
             {
-                "data": null, // No usa data del servidor
-                "render": function(data, type, row, meta) {
+                "data": null,
+                "render": function (data, type, row, meta) {
                     return `
                         <button class="btn btn-sm btn-primary edit-user" data-id="${row.id_user}">
                             <i class="fas fa-edit"></i> Editar
                         </button>
                         <button class="btn btn-sm btn-danger delete-user" data-id="${row.id_user}">
                             <i class="fas fa-trash"></i> Eliminar
+                        </button>
                     `;
                 }
             }
@@ -55,24 +58,253 @@ document.addEventListener("DOMContentLoaded", function(){
             "url": "/syscoventt/assets/plugins/datatables/spanish.json"
         }
     });
-    initModalEvents()
+
+    $('#foto').on('change', function () {
+        const file = this.files[0];
+        if (file) {
+            // Validar tipo de archivo
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+            if (!allowedTypes.includes(file.type)) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Formato no válido',
+                    text: 'Solo se permiten archivos JPG, JPEG o PNG',
+                    confirmButtonText: 'Entendido'
+                });
+                $(this).val('');
+                return;
+            }
+
+            // Validar tamaño (2MB = 2 * 1024 * 1024)
+            if (file.size > 2 * 1024 * 1024) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Archivo muy grande',
+                    text: 'La imagen no debe superar los 2MB',
+                    confirmButtonText: 'Entendido'
+                });
+                $(this).val('');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                $('#previewImgUsuario').attr('src', e.target.result);
+                $('#vistaPreviaFotoUsuario').show();
+            }
+            reader.readAsDataURL(file);
+
+            // Mostrar nombre del archivo
+            $('.custom-file-label').text(file.name);
+        } else {
+            $('#vistaPreviaFotoUsuario').hide();
+            $('.custom-file-label').text('Seleccionar archivo');
+        }
+    });
+
+    // Inicializar eventos
+    initModalEvents();
 });
 
-
-function frmAgregarUsuario(){
+// Función para abrir el modal
+function frmAgregarUsuario() {
     $("#modalAgregarUsuario").modal("show");
-    //cargarDatosModal();
+    resetForm();
 }
 
+// Función principal para agregar usuario
+function agregarUsuario(e) {
+    e.preventDefault();
+
+    // Obtener todos los campos del formulario
+    const empleadoInput = document.getElementById("id_empleado");
+    const sucursalInput = document.getElementById("id_sucursal");
+    const usernameInput = document.getElementById("username");
+    const passwordInput = document.getElementById("password");
+    const confirmPasswordInput = document.getElementById("confirm_password");
+
+
+    // Obtener valores
+    const empleado = empleadoInput.value.trim();
+    const sucursal = sucursalInput.value.trim();
+    const username = usernameInput.value.trim();
+    const password = passwordInput.value.trim();
+    const confirmPassword = confirmPasswordInput.value.trim();
+
+    // Remover clases de error previas
+    empleadoInput.classList.remove("is-invalid");
+    sucursalInput.classList.remove("is-invalid");
+    usernameInput.classList.remove("is-invalid");
+    passwordInput.classList.remove("is-invalid");
+    confirmPasswordInput.classList.remove("is-invalid");
+
+    // Validar campos vacíos
+    if (empleado === "" || sucursal === "" || username === "" || password === "" || confirmPassword === "") {
+        let camposVacios = [];
+
+        if (empleado === "") {
+            empleadoInput.classList.add("is-invalid");
+            camposVacios.push("Empleado");
+        }
+        if (sucursal === "") {
+            sucursalInput.classList.add("is-invalid");
+            camposVacios.push("Sucursal");
+        }
+        if (username === "") {
+            usernameInput.classList.add("is-invalid");
+            camposVacios.push("Nombre de Usuario");
+        }
+        if (password === "") {
+            passwordInput.classList.add("is-invalid");
+            camposVacios.push("Contraseña");
+        }
+        if (confirmPassword === "") {
+            confirmPasswordInput.classList.add("is-invalid");
+            camposVacios.push("Confirmar Contraseña");
+        }
+
+        Swal.fire({
+            icon: 'warning',
+            title: 'Campos requeridos',
+            text: 'Los siguientes campos son obligatorios: ' + camposVacios.join(', '),
+            confirmButtonText: 'Entendido',
+            scrollbarPadding: false,
+            heightAuto: false,
+            showConfirmButton: true
+        });
+
+        // Enfocar el primer campo vacío
+        if (empleado === "") empleadoInput.focus();
+        else if (sucursal === "") sucursalInput.focus();
+        else if (username === "") usernameInput.focus();
+        else if (password === "") passwordInput.focus();
+        else confirmPasswordInput.focus();
+
+        return;
+    }
+
+    // Validar que las contraseñas coincidan
+    if (password !== confirmPassword) {
+        passwordInput.classList.add("is-invalid");
+        confirmPasswordInput.classList.add("is-invalid");
+
+        Swal.fire({
+            icon: 'error',
+            title: 'Contraseñas no coinciden',
+            text: 'La contraseña y la confirmación deben ser iguales.',
+            confirmButtonText: 'Entendido',
+            scrollbarPadding: false,
+            heightAuto: false
+        });
+
+        passwordInput.focus();
+        return;
+    }
+
+    // Validar longitud mínima de contraseña
+    if (password.length < 6) {
+        passwordInput.classList.add("is-invalid");
+        confirmPasswordInput.classList.add("is-invalid");
+
+        Swal.fire({
+            icon: 'warning',
+            title: 'Contraseña muy corta',
+            text: 'La contraseña debe tener al menos 6 caracteres.',
+            confirmButtonText: 'Entendido',
+            scrollbarPadding: false,
+            heightAuto: false
+        });
+
+        passwordInput.focus();
+        return;
+    }
+
+    // VERIFICAR USERNAME ANTES DE ENVIAR
+    verificarUsername(username, function (existe) {
+        if (existe) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Usuario no disponible',
+                text: 'El nombre de usuario "' + username + '" ya está en uso. Por favor elige otro.',
+                confirmButtonText: 'Entendido',
+                scrollbarPadding: false,
+                heightAuto: false
+            });
+            usernameInput.focus().select();
+            return;
+        }
+
+
+        // Si todas las validaciones pasan, enviar el formulario
+        const url = BASE_URL + "Usuarios/agregar";
+        const form = document.getElementById("frmAgregarUsuario");
+        const http = new XMLHttpRequest();
+
+        http.open("POST", url, true);
+        http.send(new FormData(form));
+
+        http.onreadystatechange = function () {
+            if (http.readyState == 4 && http.status == 200) {
+                console.log(http.responseText);
+
+                const response = JSON.parse(http.responseText);
+
+                if (response == "Success") {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Usuario agregado!',
+                        text: 'El usuario ha sido registrado exitosamente.',
+                        timer: 2000,
+                        showConfirmButton: false,
+                        scrollbarPadding: false,
+                        heightAuto: false
+                    }).then(() => {
+                        resetForm();
+                        $('#modalAgregarUsuario').modal('hide');
+                        // Recargar la tabla
+                        tblUsuarios.ajax.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error al crear usuario',
+                        text: response,
+                        confirmButtonText: 'Intentar nuevamente',
+                        scrollbarPadding: false,
+                        heightAuto: false
+                    });
+                }
+            }
+        };
+    });
+}
 
 // Inicializar eventos del modal
 function initModalEvents() {
+
+
+
+    // Inicializar Select2
+    $('#id_empleado').select2({
+        theme: 'bootstrap-5',
+        placeholder: 'Seleccionar empleado',
+        allowClear: true,
+        width: '100%'
+    });
+
+    $('#id_sucursal').select2({
+        theme: 'bootstrap-5',
+        placeholder: 'Seleccionar sucursal',
+        allowClear: true,
+        width: '100%'
+    });
+
     // Toggle para mostrar/ocultar contraseña
-    $('#togglePassword').click(function() {
+    $('#togglePassword').click(function () {
         togglePasswordVisibility('#password', $(this));
     });
 
-    $('#toggleConfirmPassword').click(function() {
+    $('#toggleConfirmPassword').click(function () {
         togglePasswordVisibility('#confirm_password', $(this));
     });
 
@@ -80,7 +312,7 @@ function initModalEvents() {
     $('#confirm_password').keyup(validatePasswordMatch);
 
     // Cuando se selecciona un empleado
-    $('#id_empleado').change(function() {
+    $('#id_empleado').change(function () {
         const empleadoId = $(this).val();
         if (empleadoId) {
             cargarInfoEmpleado(empleadoId);
@@ -90,15 +322,66 @@ function initModalEvents() {
         }
     });
 
-    // Enviar formulario
-    $('#frmAgregarUsuario').submit(function(e) {
-        e.preventDefault();
-        guardarUsuario();
+    initUsernameValidation();
+
+    // Enviar formulario - ESTA ES LA LÍNEA IMPORTANTE
+    $('#frmAgregarUsuario').off('submit').on('submit', function (e) {
+        agregarUsuario(e);
     });
 
     // Resetear formulario cuando se cierra el modal
-    $('#modalAgregarUsuario').on('hidden.bs.modal', function() {
+    $('#modalAgregarUsuario').on('hidden.bs.modal', function () {
         resetForm();
+    });
+}
+
+// Verificar si el username ya existe
+function verificarUsername(username, callback) {
+    if (!username || username.trim() === '') {
+        callback(false);
+        return;
+    }
+
+    const url = BASE_URL + "Usuarios/verificarUsername";
+
+    $.ajax({
+        url: url,
+        type: 'POST',
+        dataType: 'json',
+        data: { username: username },
+        success: function (response) {
+            callback(response.existe);
+        },
+        error: function (xhr, status, error) {
+            console.error('Error al verificar username:', error);
+            callback(false);
+        }
+    });
+}
+
+// Evento para verificar username en tiempo real con SweetAlert
+function initUsernameValidation() {
+    $('#username').on('blur', function () {
+        const username = $(this).val().trim();
+
+        if (username === '') {
+            return;
+        }
+
+        verificarUsername(username, function (existe) {
+            if (existe) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Usuario no disponible',
+                    text: 'El nombre de usuario "' + username + '" ya está en uso. Por favor elige otro.',
+                    confirmButtonText: 'Entendido',
+                    scrollbarPadding: false,
+                    heightAuto: false
+                }).then(() => {
+                    $('#username').focus().select();
+                });
+            }
+        });
     });
 }
 
@@ -125,71 +408,61 @@ function validatePasswordMatch() {
     }
 }
 
+// Cargar información del empleado
+function cargarInfoEmpleado(empleadoId) {
 
-//EJEMPLO
-$(document).ready(function() {
-   
 
-    // Toggle para mostrar/ocultar contraseña
-    $('#togglePassword').click(function() {
-        var passwordField = $('#password');
-        var type = passwordField.attr('type') === 'password' ? 'text' : 'password';
-        passwordField.attr('type', type);
-        $(this).find('i').toggleClass('fa-eye fa-eye-slash');
-    });
+    // Mostrar loading
+    $('#infoEmpleadoCard').hide();
+    $('#infoNombre').html('<i class="fas fa-spinner fa-spin"></i> Cargando...');
+    $('#infoCargo').text('');
+    $('#infoEmail').text('');
 
-    $('#toggleConfirmPassword').click(function() {
-        var confirmField = $('#confirm_password');
-        var type = confirmField.attr('type') === 'password' ? 'text' : 'password';
-        confirmField.attr('type', type);
-        $(this).find('i').toggleClass('fa-eye fa-eye-slash');
-    });
+    const url = BASE_URL + "Empleados/obtenerEmpleado";
 
-    // Validar coincidencia de contraseñas
-    $('#confirm_password').keyup(function() {
-        var password = $('#password').val();
-        var confirmPassword = $(this).val();
-        var matchDiv = $('#passwordMatch');
+    $.ajax({
+        url: url,
+        type: 'POST', // Puedes cambiar a GET si prefieres
+        dataType: 'json',
+        data: { id_empleado: empleadoId },
+        success: function (response) {
 
-        if (confirmPassword === '') {
-            matchDiv.html('');
-        } else if (password === confirmPassword) {
-            matchDiv.html('<small class="text-success"><i class="fas fa-check mr-1"></i>Las contraseñas coinciden</small>');
-        } else {
-            matchDiv.html('<small class="text-danger"><i class="fas fa-times mr-1"></i>Las contraseñas no coinciden</small>');
-        }
-    });
+            if (response.estado === 'success' && response.data) {
+                const emp = response.data;
 
-    // Cuando se selecciona un empleado
-    $('#id_empleado').change(function() {
-        var empleadoId = $(this).val();
-        var infoCard = $('#infoEmpleadoCard');
-
-        if (empleadoId) {
-            // Simular datos del empleado (aquí iría tu llamada AJAX)
-            var empleados = {
-                '1': { nombre: 'Romina Almeida', cargo: 'Administrador de Sistemas', email: 'ana.gomez@example.com', sucursal: 'Central' },
-                '2': { nombre: 'Jefe de Compras', cargo: 'Jefe de Compras', email: 'carlos.lopez@example.com', sucursal: 'Central' },
-                '3': { nombre: 'Auxiliar de Compras', cargo: 'Auxiliar de Compras', email: 'maria.perez@example.com', sucursal: 'Central' },
-                '4': { nombre: 'Luz Paredes', cargo: 'Jefe de Ventas', email: 'luzparedes@gmail.com', sucursal: 'Central' }
-            };
-
-            if (empleados[empleadoId]) {
-                var emp = empleados[empleadoId];
-                $('#infoNombre').text(emp.nombre);
+                $('#infoNombre').text(emp.nombre_completo);
                 $('#infoCargo').text(emp.cargo);
-                $('#infoEmail').text(emp.email);
-                $('#infoSucursal').text(emp.sucursal);
-                
-                infoCard.slideDown();
-                
-                // Sugerir username
-                var usernameSugerido = emp.nombre.toLowerCase().replace(/\s+/g, '.').normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                $('#username').val(usernameSugerido);
+                $('#infoEmail').text(emp.email || 'No especificado');
+
+                $('#infoEmpleadoCard').slideDown();
+
+            } else {
+                console.log('Error en la respuesta:', response.mensaje);
+                $('#infoEmpleadoCard').hide();
             }
-        } else {
-            infoCard.slideUp();
-            $('#username').val('');
+        },
+        error: function (xhr, status, error) {
+            console.error('Error en AJAX:', error);
+            console.log('Status:', status);
+            console.log('Respuesta del servidor:', xhr.responseText);
+            $('#infoEmpleadoCard').hide();
         }
     });
-});
+}
+
+// Resetear formulario
+function resetForm() {
+    document.getElementById("frmAgregarUsuario").reset();
+    $('#infoEmpleadoCard').hide();
+    $('#passwordMatch').html('');
+     $('#vistaPreviaFotoUsuario').hide();
+    $('.custom-file-label').text('Seleccionar archivo');
+
+    // Remover clases de validación
+    $('.is-invalid').removeClass('is-invalid');
+    $('.is-valid').removeClass('is-valid');
+
+    // Resetear Select2
+    $('#id_empleado').val(null).trigger('change');
+    $('#id_sucursal').val(null).trigger('change');
+}

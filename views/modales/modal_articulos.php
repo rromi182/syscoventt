@@ -8,7 +8,7 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <form id="frmAgregarArticulo" method="POST" enctype="multipart/form-data">
+      <form id="frmAgregarArticulo" method="POST" enctype="multipart/form-data" onclick="AgregarArticuloForm()">
         <div class="modal-body">
           <div class="row">
             <!-- Columna Izquierda -->
@@ -41,7 +41,7 @@
 
               <!-- Stock -->
               <div class="form-group">
-                <label for="stock" class="font-weight-bold">Stock *</label>
+                <label for="stock" class="font-weight-bold">Stock Minimo *</label>
                 <input type="number" class="form-control" id="stock" name="stock" 
                        placeholder="Ingrese la cantidad en stock" min="1" required>
               </div>
@@ -92,7 +92,7 @@
                   <label class="custom-file-label" for="imagen">Seleccionar archivo</label>
                 </div>
                 <small class="form-text text-muted">
-                  Formatos permitidos: JPG, PNG, GIF. Tamaño máximo: 2MB
+                  Formatos permitidos: JPG, JPEG, PNG. Tamaño máximo: 2MB
                 </small>
                 <!-- Vista previa de imagen -->
                 <div id="vistaPrevia" class="mt-2 text-center" style="display: none;">
@@ -116,7 +116,7 @@
             <i class="fas fa-times mr-1"></i>Cancelar
           </button>
           <button type="submit" class="btn btn-primary">
-            <i class="fas fa-save mr-1"></i>Guardar Artículo
+            <i class="fas fa-save mr-1"></i>Guardar 
           </button>
         </div>
       </form>

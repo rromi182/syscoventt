@@ -2,6 +2,8 @@
 
 class UsuariosModel extends Query
 {
+    private $username, $password,$foto, $id_empleado, $id_sucursal, $estado;
+
     public function __construct()
     {
         parent::__construct();
@@ -37,7 +39,7 @@ class UsuariosModel extends Query
         $sql = "UPDATE usuarios SET 
                 intentos_fallidos = intentos_fallidos + 1
                 WHERE username = '$username'";
-        return $this->save($sql);
+        return $this->update($sql);
     }
 
     public function bloquearUsuario(string $username)
@@ -46,7 +48,7 @@ class UsuariosModel extends Query
                 estado = 'BLOQUEADO',
                 intentos_fallidos = 3
                 WHERE username = '$username'";
-        return $this->save($sql);
+        return $this->update($sql);
     }
 
     public function resetearIntentos(string $username)
@@ -54,7 +56,7 @@ class UsuariosModel extends Query
         $sql = "UPDATE usuarios SET 
                 intentos_fallidos = 0
                 WHERE username = '$username'";
-        return $this->save($sql);
+        return $this->update($sql);
     }
 
     public function getUsuarios()
@@ -96,17 +98,25 @@ class UsuariosModel extends Query
         return $this->selectAll($sql);
     }
 
-    // public function getUsuario(string $username, string $password)
-    // {
-    //     $sql = "SELECT * FROM usuarios WHERE username = '$username' AND password = '$password'";
-    //     $data = $this->select($sql);
-    //     return $data;
-    // }
-        // Método para desbloquear desde el sistema
-    // public function desbloquearUsuario($id_user)
-    // {
-    //     $sql = "UPDATE usuarios SET estado = 'Activo', intentos_fallidos = 0 
-    //         WHERE id_user = $id_user";
-    //     return $this->save($sql);
-    // }
+    public function agregar(string $username, string $password, string $foto, int $id_empleado, int $id_sucursal, string $estado)
+    {
+
+        $this->username = $username;
+        $this->password = $password;
+        $this->foto = $foto;
+        $this->id_empleado = $id_empleado;
+        $this->id_sucursal = $id_sucursal;
+        $this->estado = $estado;
+
+        $sql = "INSERT INTO usuarios (username, password, foto, id_empleado, id_sucursal, estado) 
+                VALUES (?, ?, ?, ?, ?, ?)";
+        $datos = array($this->username, $this->password, $this->foto, $this->id_empleado, $this->id_sucursal, $this->estado);
+        $data =  $this->save($sql, $datos);
+        if($data == 1){
+            $response = 'Ok';
+        }else{
+            $response = 'Error';
+        }
+        return $response;
+    }
 }

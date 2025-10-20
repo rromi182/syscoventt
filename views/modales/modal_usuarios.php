@@ -5,7 +5,7 @@
       <div class="modal-header bg-primary">
         <h4 class="modal-title">Agregar Nuevo Usuario</h4>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
+          <span>&times;</span>
         </button>
       </div>
       <form id="frmAgregarUsuario" method="POST">
@@ -13,6 +13,27 @@
           <div class="row">
             <!-- Columna Izquierda -->
             <div class="col-md-6">
+              
+              <!-- Selección de Empleado -->
+              <div class="form-group">
+                <label for="id_empleado" class="font-weight-bold">Empleado *</label>
+                <select class="form-control select2" id="id_empleado" name="id_empleado" required>
+                  <option value="">Seleccionar empleado</option>
+                  <?php if (isset($empleados) && !empty($empleados)): ?>
+                    <?php foreach ($empleados as $empleado): ?>
+                      <option value="<?php echo $empleado['id_empleado']; ?>">
+                        <?php echo $empleado['per_nombre'] . ' ' . $empleado['per_apellido'] . ' - ' . $empleado['cargo']; ?>
+                      </option>
+                    <?php endforeach; ?>
+                  <?php else: ?>
+                    <option value="">No hay empleados disponibles</option>
+                  <?php endif; ?>
+                </select>
+                <small class="form-text text-muted">
+                  <i class="fas fa-info-circle mr-1"></i>Solo se muestran empleados sin usuario activo
+                </small>
+              </div>
+
               <!-- Card de Información del Empleado -->
               <div class="card card-primary card-outline" id="infoEmpleadoCard" style="display: none;">
                 <div class="card-header">
@@ -32,41 +53,18 @@
                       <td><span id="infoCargo" class="text-muted"></span></td>
                     </tr>
                     <tr>
-                      <td><strong>Email:</strong></td>
-                      <td><span id="infoEmail"></span></td>
-                    </tr>
-                    <tr>
-                      <td><strong>Sucursal:</strong></td>
-                      <td><span id="infoSucursal"></span></td>
+                      <td><strong>Correo:</strong></td>
+                      <td><span id="infoEmail" class="text-muted"></span></td>
                     </tr>
                   </table>
                 </div>
-              </div>
-              <!-- Selección de Empleado -->
-              <div class="form-group">
-                <label for="id_empleado" class="font-weight-bold">Empleado *</label>
-                <select class="form-control" id="id_empleado" name="id_empleado" required>
-                  <option value="">Seleccionar empleado</option>
-                  <?php if (isset($empleados) && !empty($empleados)): ?>
-                    <?php foreach ($empleados as $empleado): ?>
-                      <option value="<?php echo $empleado['id_empleado']; ?>">
-                        <?php echo $empleado['per_nombre'] . ' ' . $empleado['per_apellido'] . ' - ' . $empleado['cargo']; ?>
-                      </option>
-                    <?php endforeach; ?>
-                  <?php else: ?>
-                    <option value="">No hay empleados disponibles</option>
-                  <?php endif; ?>
-                </select>
-                <small class="form-text text-muted">
-                  <i class="fas fa-info-circle mr-1"></i>Solo se muestran empleados sin usuario activo
-                </small>
               </div>
 
 
               <!-- Sucursal -->
               <div class="form-group">
                 <label for="id_sucursal" class="font-weight-bold">Sucursal *</label>
-                <select class="form-control" id="id_sucursal" name="id_sucursal" required>
+                <select class="form-control select2" id="id_sucursal" name="id_sucursal" required>
                   <option value="">Seleccionar sucursal</option>
                   <?php if (isset($sucursales) && !empty($sucursales)): ?>
                     <?php foreach ($sucursales as $sucursal): ?>
@@ -79,6 +77,23 @@
                     <option value="">No hay sucursales disponibles</option>
                   <?php endif; ?>
                 </select>
+              </div>
+
+              <!-- Imagen -->
+              <div class="form-group">
+                <label for="foto" class="font-weight-bold">Foto de Perfil</label>
+                <div class="custom-file">
+                  <input type="file" class="custom-file-input" id="foto" name="foto" 
+                         accept="image/jpeg, image/jpg, image/png">
+                  <label class="custom-file-label" for="foto">Seleccionar archivo</label>
+                </div>
+                <small class="form-text text-muted">
+                  Formatos permitidos: JPG, JPEG, PNG. Tamaño máximo: 2MB
+                </small>
+                <!-- Vista previa de imagen -->
+                <div id="vistaPreviaFotoUsuario" class="mt-2 text-center" style="display: none;">
+                  <img id="previewImgUsuario" src="#" alt="Vista previa" class="img-thumbnail" style="max-height: 150px;">
+                </div>
               </div>
             </div>
 
@@ -103,7 +118,7 @@
                         </span>
                       </div>
                       <input type="text" class="form-control" id="username" name="username"
-                        placeholder="Ingrese el nombre de usuario" required>
+                        placeholder="Ingrese el nombre de usuario">
                     </div>
                     <small class="form-text text-muted">
                       El username debe ser único en el sistema
@@ -120,7 +135,7 @@
                         </span>
                       </div>
                       <input type="password" class="form-control" id="password" name="password"
-                        placeholder="Ingrese la contraseña" required>
+                        placeholder="Ingrese la contraseña">
                       <div class="input-group-append">
                         <button class="btn btn-outline-secondary" type="button" id="togglePassword">
                           <i class="fas fa-eye"></i>
@@ -139,7 +154,7 @@
                         </span>
                       </div>
                       <input type="password" class="form-control" id="confirm_password" name="confirm_password"
-                        placeholder="Confirme la contraseña" required>
+                        placeholder="Confirme la contraseña">
                       <div class="input-group-append">
                         <button class="btn btn-outline-secondary" type="button" id="toggleConfirmPassword">
                           <i class="fas fa-eye"></i>
@@ -147,15 +162,6 @@
                       </div>
                     </div>
                     <div id="passwordMatch" class="mt-1"></div>
-                  </div>
-
-                  <!-- Estado (si lo necesitas) -->
-                  <div class="form-group">
-                    <label class="font-weight-bold">Estado</label>
-                    <div class="custom-control custom-switch">
-                      <input type="checkbox" class="custom-control-input" id="estado" name="estado" checked>
-                      <label class="custom-control-label" for="estado">Usuario Activo</label>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -166,7 +172,7 @@
           <button type="button" class="btn btn-default" data-dismiss="modal">
             <i class="fas fa-times mr-1"></i>Cancelar
           </button>
-          <button type="submit" class="btn btn-primary">
+          <button type="button" class="btn btn-primary" onclick="agregarUsuario(event);">
             <i class="fas fa-save mr-1"></i>Guardar Usuario
           </button>
         </div>

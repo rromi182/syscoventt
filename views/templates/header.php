@@ -31,7 +31,13 @@
   <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/plugins/datatables-searchpanes/css/searchPanes.bootstrap4.min.css">
   <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/plugins/datatables-select/css/select.bootstrap4.min.css">
 
+  <!--SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+  <!-- CSS de Select2 -->
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <!-- Select2 Bootstrap 5 theme (opcional pero recomendado) -->
+  <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
 
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
