@@ -57,12 +57,23 @@ class ArticulosModel extends Query
     }
 
     // Insertar nuevo artículo
-    public function insertarArticulo($codigo, $descripcion, $precio, $imagen, $stock, $id_marca, $id_categoria)
-    {
-        $sql = "INSERT INTO articulos (codigo_articulo, articulo_descrip, precio, foto, stock_minimo, id_marca, id_categoria, estado) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, 'ACTIVO')";
-        return $this->insert($sql, [$codigo, $descripcion, $precio, $imagen, $stock, $id_marca, $id_categoria]);
+    public function agregar(string $codigo, string $descripcion, float $precio, string $foto, int $stock_minimo, int $id_marca, int $id_categoria, string $estado)
+{
+    $sql = "INSERT INTO articulos (codigo_articulo, articulo_descrip, precio, foto, stock_minimo, id_categoria, id_marca, estado) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    
+    $datos = array($codigo, $descripcion, $precio, $foto, $stock_minimo, $id_categoria, $id_marca, $estado);
+    
+    $data = $this->save($sql, $datos);
+    
+    if($data == 1){
+        $response = 'Ok';
+    } else {
+        $response = 'Error';
     }
+    return $response;
+}
 
+    
     
 }

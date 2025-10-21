@@ -32,117 +32,106 @@ class Articulos extends Controller
     }
 
     public function agregar()
-    {
-        // Validar que la solicitud sea POST
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $response = array('status' => false, 'msg' => 'Método no permitido');
-            header('Content-Type: application/json');
-            echo json_encode($response, JSON_UNESCAPED_UNICODE);
+{
+
+
+    if ($_POST) {
+        $codigo = strtoupper(trim($_POST['codigo']));
+        $descripcion = strtoupper(trim($_POST['descripcion']));
+        $precio = $_POST['precio'];
+        $stock_minimo = $_POST['stock_minimo'];
+        $id_marca = $_POST['id_marca'];
+        $id_categoria = $_POST['id_categoria'];
+        $estado = 'ACTIVO';
+
+        // Validar campos requeridos
+        if (empty($codigo) || empty($descripcion) || empty($precio) || empty($stock_minimo) || empty($id_marca) || empty($id_categoria)) {
+            echo json_encode("Todos los campos son obligatorios.", JSON_UNESCAPED_UNICODE);
             die();
         }
 
-        try {
-            // Obtener y limpiar datos del formulario
-            $codigo = strtoupper(trim($_POST['codigo'] ?? ''));
-            $descripcion = trim($_POST['descripcion'] ?? '');
-            $precio = isset($_POST['precio']) ? floatval(str_replace('.', '', $_POST['precio'])) : 0;
-            $stock = intval($_POST['stock'] ?? 0);
-            $id_marca = intval($_POST['id_marca'] ?? 0);
-            $id_categoria = intval($_POST['id_categoria'] ?? 0);
-            $imagen = $_FILES['imagen'] ?? null;
-
-            // Validaciones básicas
-            if (empty($codigo) || empty($descripcion) || $precio <= 0 || $stock < 0 || $id_marca <= 0 || $id_categoria <= 0) {
-                throw new Exception('Todos los campos son obligatorios y deben ser válidos');
-            }
-
-            // Validar longitud del código
-            if (strlen($codigo) > 20) {
-                throw new Exception('El código no puede tener más de 20 caracteres');
-            }
-
-            // Verificar si el código ya existe
-            $codigoExiste = $this->model->verificarCodigo($codigo);
-            if ($codigoExiste) {
-                throw new Exception('El código del artículo ya existe');
-            }
-
-            // Verificar si la descripción ya existe
-            $descripcionExiste = $this->model->verificarDescripcion($descripcion);
-            if ($descripcionExiste) {
-                throw new Exception('La descripción del artículo ya existe');
-            }
-
-            // Validar marca existente
-            $marcaExiste = $this->marcasModel->getMarcaById($id_marca);
-            if (!$marcaExiste) {
-                throw new Exception('La marca seleccionada no existe');
-            }
-
-            // Validar categoría existente
-            $categoriaExiste = $this->categoriasModel->getCategoriaById($id_categoria);
-            if (!$categoriaExiste) {
-                throw new Exception('La categoría seleccionada no existe');
-            }
-
-            // Procesar imagen si se subió
-            $nombreImagen = '';
-            if ($imagen && $imagen['error'] === UPLOAD_ERR_OK) {
-                $nombreImagen = $this->procesarImagen($imagen, $codigo);
-            }
-
-            // Insertar el artículo
-            $result = $this->model->insertarArticulo($codigo, $descripcion, $precio, $nombreImagen, $stock, $id_marca, $id_categoria);
-
-            if ($result > 0) {
-                $response = array('status' => true, 'msg' => 'Artículo guardado correctamente');
-            } else {
-                throw new Exception('Error al guardar el artículo en la base de datos');
-            }
-        } catch (Exception $e) {
-            $response = array('status' => false, 'msg' => $e->getMessage());
+        // Validar que el precio sea mayor a 0
+        if ($precio <= 0) {
+            echo json_encode("El precio debe ser mayor a 0.", JSON_UNESCAPED_UNICODE);
+            die();
         }
 
-        header('Content-Type: application/json');
-        echo json_encode($response, JSON_UNESCAPED_UNICODE);
+        // Validar que el stock sea mayor a 0
+        if ($stock_minimo <= 0) {
+            echo json_encode("El stock mínimo debe ser mayor a 0.", JSON_UNESCAPED_UNICODE);
+            die();
+        }
+
+        // Verificar si el código ya existe
+        $codigoExistente = $this->model->verificarCodigo($codigo);
+        if ($codigoExistente) {
+            echo json_encode("El código ya existe en el sistema.", JSON_UNESCAPED_UNICODE);
+            die();
+        }
+
+        // Verificar si la descripción ya existe
+        $descripcionExistente = $this->model->verificarDescripcion($descripcion);
+        if ($descripcionExistente) {
+            echo json_encode("La descripción ya existe en el sistema.", JSON_UNESCAPED_UNICODE);
+            die();
+        }
+
+        // Manejar la imagen
+         $foto = 'no-image.jpg'; // Valor por defecto
+
+            if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
+                $archivo = $_FILES['imagen'];
+                $extension = pathinfo($archivo['name'], PATHINFO_EXTENSION);
+                $extension = strtolower($extension);
+
+                // Validar extensión
+                $extensionesPermitidas = ['jpg', 'jpeg', 'png'];
+                if (in_array($extension, $extensionesPermitidas)) {
+                    // Validar tamaño (2MB)
+                    if ($archivo['size'] <= 2 * 1024 * 1024) {
+                        // Generar nombre único
+                        $foto = 'articulo_' . time() . '_' . uniqid() . '.' . $extension;
+                        $rutaDestino = 'assets/img/articulos/' . $foto;
+
+                        // Mover el archivo
+                        move_uploaded_file($archivo['tmp_name'], $rutaDestino);
+                    }
+                }
+            }
+
+        $data = $this->model->agregar($codigo, $descripcion, $precio, $foto, $stock_minimo, $id_marca, $id_categoria, $estado);
+        
+        if ($data == 'Ok') {
+            $msg = "Success";
+        } else {
+            $msg = "Error al guardar el artículo";
+        }
+
+        echo json_encode($msg, JSON_UNESCAPED_UNICODE);
         die();
     }
+}
 
-    // Función para procesar la imagen
-    private function procesarImagen($imagen, $codigoArticulo)
-    {
-        // Configuración
-        $directorio = 'assets/img/articulos/';
-        $maxSize = 2 * 1024 * 1024; // 2MB
-        $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-
-        // Validar tipo de archivo
-        if (!in_array($imagen['type'], $allowedTypes)) {
-            throw new Exception('Solo se permiten archivos JPG, JPEG y PNG');
+    public function verificarCodigo()
+{
+    if ($_POST && isset($_POST['codigo'])) {
+        $codigo = trim($_POST['codigo']);
+        
+        if (empty($codigo)) {
+            echo json_encode(['existe' => false]);
+            die();
         }
-
-        // Validar tamaño
-        if ($imagen['size'] > $maxSize) {
-            throw new Exception('La imagen no puede exceder los 2MB');
-        }
-
-        // Obtener extensión del archivo
-        $extension = pathinfo($imagen['name'], PATHINFO_EXTENSION);
-
-        // Crear nombre único para la imagen (usando el código del artículo y timestamp)
-        $nombreArchivo = $codigoArticulo . '_' . time() . '.' . strtolower($extension);
-        $rutaCompleta = $directorio . $nombreArchivo;
-
-        // Crear directorio si no existe
-        if (!is_dir($directorio)) {
-            mkdir($directorio, 0755, true);
-        }
-
-        // Mover archivo al directorio
-        if (move_uploaded_file($imagen['tmp_name'], $rutaCompleta)) {
-            return $nombreArchivo;
-        } else {
-            throw new Exception('Error al subir la imagen');
-        }
+        
+        // Verificar si el código ya existe
+        $existe = $this->model->verificarCodigo($codigo);
+        
+        // Devolver true/false en lugar del objeto completo
+        echo json_encode(['existe' => !empty($existe)]);
+        die();
     }
+    
+    echo json_encode(['existe' => false]);
+    die();
+}
+
 }

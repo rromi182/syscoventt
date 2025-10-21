@@ -282,8 +282,6 @@ function agregarUsuario(e) {
 // Inicializar eventos del modal
 function initModalEvents() {
 
-
-
     // Inicializar Select2
     $('#id_empleado').select2({
         theme: 'bootstrap-5',
