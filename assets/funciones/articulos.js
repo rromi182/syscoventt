@@ -268,29 +268,29 @@ function agregarArticulo(e) {
         return;
     }
 
-   // console.log("Datos a enviar: ", "Código: " + codigo, "Descripción: " + descripcion, "Precio: " + precio, "Stock Minimo: " + stock_minimo, "Marca: " + marca, "Categoría: " + categoria);
+    // console.log("Datos a enviar: ", "Código: " + codigo, "Descripción: " + descripcion, "Precio: " + precio, "Stock Minimo: " + stock_minimo, "Marca: " + marca, "Categoría: " + categoria);
 
 
     verificarCodigo(codigo, function (existe) {
-    if (existe) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Código no disponible',
-            text: 'El código "' + codigo + '" ya está en uso. Por favor usa otro código.',
-            confirmButtonText: 'Entendido',
-            scrollbarPadding: false,
-            heightAuto: false
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // SOLUCIÓN: Esperar a que el modal de SweetAlert se cierre completamente
-                setTimeout(() => {
-                    codigoInput.focus();
-                    codigoInput.select();
-                }, 300);
-            }
-        });
-        return;
-    }
+        if (existe) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Código no disponible',
+                text: 'El código "' + codigo + '" ya está en uso. Por favor usa otro código.',
+                confirmButtonText: 'Entendido',
+                scrollbarPadding: false,
+                heightAuto: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // SOLUCIÓN: Esperar a que el modal de SweetAlert se cierre completamente
+                    setTimeout(() => {
+                        codigoInput.focus();
+                        codigoInput.select();
+                    }, 300);
+                }
+            });
+            return;
+        }
 
         // Si todas las validaciones pasan, enviar el formulario
         const url = BASE_URL + "Articulos/agregar";
@@ -339,11 +339,11 @@ function agregarArticulo(e) {
 // Inicializar eventos del modal de artículos
 function initModalArticulosEvents() {
     console.log('Inicializando eventos del modal...');
-    
+
     // LIMPIAR EVENTOS ANTERIORES
     $('#frmAgregarArticulo').off('submit');
     $('#codigo').off('blur.codigo');
-    
+
     // Inicializar Select2
     $('#id_marca').select2({
         theme: 'bootstrap-5',
@@ -358,7 +358,7 @@ function initModalArticulosEvents() {
         allowClear: true,
         width: '100%'
     });
-    
+
 
     // Enviar formulario
     $('#frmAgregarArticulo').on('submit', function (e) {
@@ -376,7 +376,7 @@ function verificarCodigo(codigo, callback) {
 
     // Evitar múltiples llamadas rápidas
     clearTimeout(codigoTimeout);
-    codigoTimeout = setTimeout(function() {
+    codigoTimeout = setTimeout(function () {
         const url = BASE_URL + "Articulos/verificarCodigo";
         $.ajax({
             url: url,

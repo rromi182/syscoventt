@@ -72,6 +72,7 @@
 <script src="<?php echo BASE_URL; ?>assets/funciones/marcas.js"></script>
 <script src="<?php echo BASE_URL; ?>assets/funciones/categorias.js"></script>
 <script src="<?php echo BASE_URL; ?>assets/funciones/articulos.js"></script>
+<script src="<?php echo BASE_URL; ?>assets/funciones/pedidos_compras.js"></script>
 
 
 <!-- Scripts adicionales personalizados -->

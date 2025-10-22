@@ -2,7 +2,7 @@
 
 class UsuariosModel extends Query
 {
-    private $username, $password,$foto, $id_empleado, $id_sucursal, $estado;
+    private $username, $password,$foto, $id_empleado, $id_sucursal, $estado, $id_user;
 
     public function __construct()
     {
@@ -70,7 +70,7 @@ class UsuariosModel extends Query
                 INNER JOIN cargos c ON e.id_cargo = c.id_cargo
                 INNER JOIN personas p ON e.id_persona = p.id_persona
                 INNER JOIN sucursales s ON u.id_sucursal = s.id_sucursal
-                WHERE u.estado = 'ACTIVO' or u.estado = 'BLOQUEADO'
+                WHERE u.estado = 'ACTIVO' or u.estado = 'BLOQUEADO' or u.estado = 'INACTIVO'
                 ";
 
         $data = $this->selectAll($sql);
@@ -118,5 +118,27 @@ class UsuariosModel extends Query
             $response = 'Error';
         }
         return $response;
+    }
+
+    public function editar(int $id_user){
+        $sql = "SELECT * FROM usuarios WHERE id_user = $id_user;";
+        $data = $this->select($sql);
+        return $data;
+    }
+
+    public function eliminar(int $id_user){
+        $this->id_user = $id_user;
+        $sql = "UPDATE usuarios SET estado = 'INACTIVO' WHERE id_user = ?";
+        $datos = array($this->id_user);
+        $data = $this->save($sql, $datos); 
+        return $data;
+    }
+
+    public function activar(int $id_user){
+        $this->id_user = $id_user;
+        $sql = "UPDATE usuarios SET estado = 'ACTIVO' WHERE id_user = ?";
+        $datos = array($this->id_user);
+        $data = $this->save($sql, $datos); 
+        return $data;
     }
 }

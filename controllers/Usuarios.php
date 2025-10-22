@@ -150,6 +150,38 @@ class Usuarios extends Controller
         die();
     }
 
+    public function editar(int $id_user)
+    {
+        $data = $this->model->editar($id_user);
+        echo json_encode($data, JSON_UNESCAPED_UNICODE);
+        die();
+    }
+
+    public function eliminar(int $id_user)
+    {
+       
+        $data = $this->model->eliminar($id_user);
+        if($data == 1){
+            $msg = "Success";
+        }else{
+            $msg = "Error";
+        }
+        echo json_encode($msg, JSON_UNESCAPED_UNICODE);
+        die();
+    }
+
+    public function activar(int $id_user)
+    {
+        $data = $this->model->activar($id_user);
+        if ($data == 1) {
+            $msg = "Success";
+        } else {
+            $msg = "Error";
+        }
+        echo json_encode($msg, JSON_UNESCAPED_UNICODE);
+        die();
+    }
+
     // Método para verificar si el username existe
     public function verificarUsername()
     {

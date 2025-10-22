@@ -83,7 +83,7 @@
             <!-- Operaciones de Auxiliar -->
             <?php if (PermisosHelper::tienePermiso(PERMISO_REGISTRAR_PEDIDO_COMPRA) || PermisosHelper::tienePermiso(PERMISO_ADMIN_TOTAL)): ?>
             <li class="nav-item">
-              <a href="#" class="nav-link">
+              <a href="<?php echo BASE_URL; ?>PedidosCompras" class="nav-link">
                 <i class="far fa-circle nav-icon"></i>
                 <p>Pedido de Compra</p>
               </a>

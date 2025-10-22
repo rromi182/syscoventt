@@ -3,7 +3,7 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header bg-primary">
-        <h4 class="modal-title">Agregar Nuevo Usuario</h4>
+        <h4 class="modal-title" id="titleModal">Agregar Nuevo Usuario</h4>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span>&times;</span>
         </button>
@@ -173,7 +173,7 @@
             <i class="fas fa-times mr-1"></i>Cancelar
           </button>
           <button type="button" class="btn btn-primary" onclick="agregarUsuario(event);">
-            <i class="fas fa-save mr-1"></i>Guardar Usuario
+            <i class="fas fa-save mr-1"></i>Guardar
           </button>
         </div>
       </form>

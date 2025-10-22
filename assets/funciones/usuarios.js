@@ -35,14 +35,34 @@ document.addEventListener("DOMContentLoaded", function () {
             {
                 "data": null,
                 "render": function (data, type, row, meta) {
+                    const isActive = row.estado === 'ACTIVO';
+                    const btnDesactivarDisabled = isActive ? '' : 'disabled';
+                    const btnActivarDisabled = !isActive ? '' : 'disabled';
+
                     return `
-                        <button class="btn btn-sm btn-primary edit-user" data-id="${row.id_user}">
-                            <i class="fas fa-edit"></i> Editar
-                        </button>
-                        <button class="btn btn-sm btn-danger delete-user" data-id="${row.id_user}">
-                            <i class="fas fa-trash"></i> Eliminar
-                        </button>
-                    `;
+            <button class="btn btn-sm btn-primary" 
+                    data-toggle="tooltip" 
+                    title="Editar Usuario" 
+                    onclick="editarUsuario(${row.id_user})">
+                <i class="fas fa-edit"></i>
+            </button>
+            
+            <button class="btn btn-sm btn-danger" 
+                    data-toggle="tooltip" 
+                    title="Eliminar Usuario" 
+                    onclick="eliminarUsuario(${row.id_user})"
+                    ${btnDesactivarDisabled}>
+                <i class="fas fa-ban"></i>
+            </button>
+            
+            <button class="btn btn-sm btn-success" 
+                    data-toggle="tooltip" 
+                    title="Activar Usuario" 
+                    onclick="activarUsuario(${row.id_user})"
+                    ${btnActivarDisabled}>
+                <i class="fas fa-check"></i>
+            </button>
+        `;
                 }
             }
         ],
@@ -108,12 +128,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // Función para abrir el modal
 function frmAgregarUsuario() {
+    document.getElementById("titleModal").textContent = "Agregar Nuevo Usuario";
     $("#modalAgregarUsuario").modal("show");
     resetForm();
 }
 
 // Función principal para agregar usuario
 function agregarUsuario(e) {
+
     e.preventDefault();
 
     // Obtener todos los campos del formulario
@@ -229,8 +251,16 @@ function agregarUsuario(e) {
                 confirmButtonText: 'Entendido',
                 scrollbarPadding: false,
                 heightAuto: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // SOLUCIÓN: Esperar a que el modal de SweetAlert se cierre completamente
+                    setTimeout(() => {
+                        usernameInput.classList.add("is-invalid");
+                        usernameInput.focus();
+                        usernameInput.select();
+                    }, 300);
+                }
             });
-            usernameInput.focus().select();
             return;
         }
 
@@ -279,6 +309,136 @@ function agregarUsuario(e) {
     });
 }
 
+//Pendiente terminar
+function editarUsuario(id_user) {
+    document.getElementById("titleModal").textContent = "Editar Usuario";
+    //console.log(id_user);
+
+    const url = BASE_URL + "Usuarios/editar/" + id_user;
+    const http = new XMLHttpRequest();
+
+    http.open("GET", url, true);
+    http.send();
+
+    http.onreadystatechange = function () {
+        if (http.readyState == 4 && http.status == 200) {
+            const response = JSON.parse(http.responseText);
+            // Obtener todos los campos del formulario
+            empleadoInput = document.getElementById("id_empleado").value = response.id_empleado;
+            sucursalInput = document.getElementById("id_sucursal").value = response.id_sucursal;
+            usernameInput = document.getElementById("username").value = response.username;
+            fotoInput = document.getElementById("foto").value = response.foto;
+        }
+    };
+    $("#modalAgregarUsuario").modal("show");
+}
+
+function eliminarUsuario(id_user) {
+    Swal.fire({
+        title: "¿Estás seguro?",
+        text: "El usuario no se eliminará pero será desactivado y no podrá acceder al sistema",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Sí!",
+        cancelButtonText: "Cancelar"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const url = BASE_URL + "Usuarios/eliminar/" + id_user;
+            const http = new XMLHttpRequest();
+
+            http.open("GET", url, true);
+            http.send();
+
+            http.onreadystatechange = function () {
+                if (http.readyState == 4 && http.status == 200) {
+                    const response = JSON.parse(http.responseText);
+
+                    if (response == "Success") {
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Usuario eliminado!',
+                            text: 'El usuario ha sido eliminado correctamente.',
+                            timer: 2000,
+                            showConfirmButton: false,
+                            scrollbarPadding: false,
+                            heightAuto: false
+                        }).then(() => {
+                            // Recargar la tabla
+                            tblUsuarios.ajax.reload();
+
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error al eliminar usuario',
+                            text: response,
+                            confirmButtonText: 'Intentar nuevamente',
+                            scrollbarPadding: false,
+                            heightAuto: false
+                        });
+                    }
+                }
+            };
+        }
+    });
+}
+
+function activarUsuario(id_user) {
+    console.log("ID USUARIO: " + id_user);
+    Swal.fire({
+        title: "¿Estás seguro?",
+        text: "El usuario no se eliminará pero será desactivado y no podrá acceder al sistema",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Sí!",
+        cancelButtonText: "Cancelar"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const url = BASE_URL + "Usuarios/activar/" + id_user;
+            const http = new XMLHttpRequest();
+
+            http.open("GET", url, true);
+            http.send();
+
+            http.onreadystatechange = function () {
+                if (http.readyState == 4 && http.status == 200) {
+                    const response = JSON.parse(http.responseText);
+
+                    if (response == "Success") {
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Usuario activado!',
+                            text: 'El usuario ha sido activado correctamente.',
+                            timer: 2000,
+                            showConfirmButton: false,
+                            scrollbarPadding: false,
+                            heightAuto: false
+                        }).then(() => {
+                            // Recargar la tabla
+                            tblUsuarios.ajax.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error al activar usuario',
+                            text: response,
+                            confirmButtonText: 'Intentar nuevamente',
+                            scrollbarPadding: false,
+                            heightAuto: false
+                        });
+                    }
+
+
+                }
+            };
+        }
+    });
+}
+
 // Inicializar eventos del modal
 function initModalEvents() {
 
@@ -320,7 +480,7 @@ function initModalEvents() {
         }
     });
 
-    initUsernameValidation();
+    //initUsernameValidation();
 
     // Enviar formulario - ESTA ES LA LÍNEA IMPORTANTE
     $('#frmAgregarUsuario').off('submit').on('submit', function (e) {
@@ -354,32 +514,6 @@ function verificarUsername(username, callback) {
             console.error('Error al verificar username:', error);
             callback(false);
         }
-    });
-}
-
-// Evento para verificar username en tiempo real con SweetAlert
-function initUsernameValidation() {
-    $('#username').on('blur', function () {
-        const username = $(this).val().trim();
-
-        if (username === '') {
-            return;
-        }
-
-        verificarUsername(username, function (existe) {
-            if (existe) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Usuario no disponible',
-                    text: 'El nombre de usuario "' + username + '" ya está en uso. Por favor elige otro.',
-                    confirmButtonText: 'Entendido',
-                    scrollbarPadding: false,
-                    heightAuto: false
-                }).then(() => {
-                    $('#username').focus().select();
-                });
-            }
-        });
     });
 }
 
@@ -453,7 +587,7 @@ function resetForm() {
     document.getElementById("frmAgregarUsuario").reset();
     $('#infoEmpleadoCard').hide();
     $('#passwordMatch').html('');
-     $('#vistaPreviaFotoUsuario').hide();
+    $('#vistaPreviaFotoUsuario').hide();
     $('.custom-file-label').text('Seleccionar archivo');
 
     // Remover clases de validación
