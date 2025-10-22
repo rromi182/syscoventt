@@ -10,19 +10,26 @@ document.addEventListener("DOMContentLoaded", function () {
         "columns": [
             { "data": "id_pedido_compra" },
             { "data": "fecha_registro" },
-            { "data": "username" },
+            { "data": "nombre_completo" },
             { "data": "sucursal" },
             {"data": "estado"},
             {
                 "data": null,
                 "render": function (data, type, row) {
                     return `
-                        <button class="btn btn-sm btn-primary edit-articulo" data-id="${row.id_pedido_compra}">
-                            <i class="fas fa-edit"></i> Aprobar
+                        <button class="btn btn-sm btn-success" data-toggle="tooltip" title="Aprobar Pedido" 
+                        onclick="aprobarPedido(${row.id_pedido_compra})">
+                            <i class="fas fa-check"></i>
                         </button>
-                        <button class="btn btn-sm btn-danger delete-articulo" data-id="${row.id_pedido_compra}">
-                            <i class="fas fa-trash"></i> Anular
+                        <button class="btn btn-sm btn-danger" data-toggle="tooltip" title="Anular Pedido" 
+                        onclick="anularPedido(${row.id_pedido_compra})">
+                            <i class="fas fa-ban"></i>
                         </button>
+                        <button class="btn btn-sm btn-warning" data-toggle="tooltip" title="Imprimir Informe" 
+                        onclick="generarInformePedido(${row.id_pedido_compra})">
+                            <i class="fas fa-print"></i>
+                        </button>
+
                     `;
                 },
                 "orderable": false,
@@ -45,3 +52,20 @@ document.addEventListener("DOMContentLoaded", function () {
     // Inicializar eventos
    // initModalEvents();
 });
+
+/*
+//Funcion para generar Informe
+*/
+function generarInformePedido(id_pedido_compra) {
+
+    const ruta = BASE_URL + "PedidosCompras/generarInformePedido/"+ id_pedido_compra;//Prueba despues poner el id del pedido correspondiente    
+    // Abrir en nueva ventana y luego imprimir
+    const abrir = window.open(ruta, '_blank');
+    
+    // Esperar a que cargue la ventana y luego imprimir
+    abrir.onload = function() {
+        abrir.print();
+        // Opcional: cerrar después de imprimir
+        abrir.onafterprint = function() { abrir.close(); };
+    };
+}

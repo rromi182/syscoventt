@@ -51,11 +51,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 "data": null,
                 "render": function (data, type, row) {
                     return `
-                        <button class="btn btn-sm btn-primary edit-articulo" data-id="${row.id_articulo}">
-                            <i class="fas fa-edit"></i> Editar
+                        <button class="btn btn-sm btn-primary" data-toggle="tooltip" title="Editar Articulo" 
+                        onclick="editarArticulo(${row.id_articulo})">
+                            <i class="fas fa-edit"></i>
                         </button>
-                        <button class="btn btn-sm btn-danger delete-articulo" data-id="${row.id_articulo}">
-                            <i class="fas fa-trash"></i> Eliminar
+                        <button class="btn btn-sm btn-danger" data-toggle="tooltip" title="Eliminar Articulo" 
+                         onclick="eliminarArticulo(${row.id_articulo})">
+                            <i class="fas fa-trash"></i>
                         </button>
                     `;
                 },
@@ -145,21 +147,26 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
-
+/*
 // Función para abrir el modal
+*/
 function frmAgregarArticulo() {
     console.log('Abriendo modal...');
     resetFormArticulo();
     $("#modalAgregarArticulo").modal("show");
 }
 
+/*
 // Función para ver imagen en modal
+*/
 function verImagen(ruta) {
     $('#imagenAmpliada').attr('src', ruta);
     $('#modalImagen').modal('show');
 }
 
+/*
 // Función principal para agregar artículo
+*/
 function agregarArticulo(e) {
     e.preventDefault();
 
@@ -336,7 +343,9 @@ function agregarArticulo(e) {
     });
 }
 
+/*
 // Inicializar eventos del modal de artículos
+*/
 function initModalArticulosEvents() {
     console.log('Inicializando eventos del modal...');
 
@@ -366,7 +375,9 @@ function initModalArticulosEvents() {
     });
 }
 
+/*
 // Verificar si el código ya existe
+*/
 let codigoTimeout;
 function verificarCodigo(codigo, callback) {
     if (!codigo || codigo.trim() === '') {
@@ -394,7 +405,9 @@ function verificarCodigo(codigo, callback) {
     }, 300);
 }
 
+/*
 // Resetear formulario de artículos
+*/
 function resetFormArticulo() {
     document.getElementById("frmAgregarArticulo").reset();
     $('#vistaPrevia').hide();

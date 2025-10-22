@@ -92,7 +92,9 @@ function loginForm(e) {
 
 }
 
+/*
 //Event listeners para Enter en Login
+*/
 document.addEventListener('DOMContentLoaded', function() {
     const usernameInput = document.getElementById('username');
     const passwordInput = document.getElementById('password');

@@ -40,9 +40,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     const btnActivarDisabled = !isActive ? '' : 'disabled';
 
                     return `
-            <button class="btn btn-sm btn-primary" 
-                    data-toggle="tooltip" 
-                    title="Editar Usuario" 
+            <button class="btn btn-sm btn-primary" data-toggle="tooltip" title="Editar Usuario" 
                     onclick="editarUsuario(${row.id_user})">
                 <i class="fas fa-edit"></i>
             </button>
@@ -126,14 +124,18 @@ document.addEventListener("DOMContentLoaded", function () {
     initModalEvents();
 });
 
-// Función para abrir el modal
+/*
+//Funcion para abrir el modal
+*/
 function frmAgregarUsuario() {
     document.getElementById("titleModal").textContent = "Agregar Nuevo Usuario";
     $("#modalAgregarUsuario").modal("show");
     resetForm();
 }
 
-// Función principal para agregar usuario
+/*
+// Funcion para agregar Usuario
+*/
 function agregarUsuario(e) {
 
     e.preventDefault();
@@ -309,7 +311,10 @@ function agregarUsuario(e) {
     });
 }
 
-//Pendiente terminar
+/*
+// Funcion para editar usuario
+   Pendiente terminar
+*/ 
 function editarUsuario(id_user) {
     document.getElementById("titleModal").textContent = "Editar Usuario";
     //console.log(id_user);
@@ -332,7 +337,9 @@ function editarUsuario(id_user) {
     };
     $("#modalAgregarUsuario").modal("show");
 }
-
+/*
+//Funcion eliminar usuario
+*/
 function eliminarUsuario(id_user) {
     Swal.fire({
         title: "¿Estás seguro?",
@@ -385,6 +392,9 @@ function eliminarUsuario(id_user) {
     });
 }
 
+/*
+//Funcion activar usuario
+*/
 function activarUsuario(id_user) {
     console.log("ID USUARIO: " + id_user);
     Swal.fire({
@@ -439,7 +449,9 @@ function activarUsuario(id_user) {
     });
 }
 
+/*
 // Inicializar eventos del modal
+*/
 function initModalEvents() {
 
     // Inicializar Select2
@@ -493,7 +505,9 @@ function initModalEvents() {
     });
 }
 
+/*
 // Verificar si el username ya existe
+*/
 function verificarUsername(username, callback) {
     if (!username || username.trim() === '') {
         callback(false);
@@ -517,7 +531,9 @@ function verificarUsername(username, callback) {
     });
 }
 
+/*
 // Toggle visibilidad de contraseña
+*/
 function togglePasswordVisibility(fieldId, button) {
     const field = $(fieldId);
     const type = field.attr('type') === 'password' ? 'text' : 'password';
@@ -525,7 +541,9 @@ function togglePasswordVisibility(fieldId, button) {
     button.find('i').toggleClass('fa-eye fa-eye-slash');
 }
 
+/*
 // Validar que las contraseñas coincidan
+*/
 function validatePasswordMatch() {
     const password = $('#password').val();
     const confirmPassword = $('#confirm_password').val();
@@ -540,7 +558,9 @@ function validatePasswordMatch() {
     }
 }
 
+/*
 // Cargar información del empleado
+*/
 function cargarInfoEmpleado(empleadoId) {
 
 
@@ -582,7 +602,9 @@ function cargarInfoEmpleado(empleadoId) {
     });
 }
 
+/*
 // Resetear formulario
+*/
 function resetForm() {
     document.getElementById("frmAgregarUsuario").reset();
     $('#infoEmpleadoCard').hide();

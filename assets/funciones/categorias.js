@@ -71,7 +71,9 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+/*
 // Evento para abrir modal de nueva categoria
+*/
 function frmAgregarCategoria(){
     $("#modalAgregarCategoria").modal("show");
     //cargarDatosModal();

@@ -71,7 +71,9 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+/*
 // Evento para abrir modal de nueva marca
+*/
 function frmAgregarMarca(){
     $("#modalAgregarMarca").modal("show");
     //cargarDatosModal();
