@@ -35,6 +35,25 @@ class PedidosCompras extends Controller
         echo json_encode($data, JSON_UNESCAPED_UNICODE);
     }
 
+    /*
+    //Funcion para mostrar el formulario de agregar pedido
+    */ 
+    public function agregar()
+    {
+        $data['sucursales'] = $this->sucursalesModel->getSucursales();
+        $data['articulos'] = $this->articulosModel->getArticulos(); // Asegúrate de tener este método
+        $this->views->getView($this, "agregar", $data);
+    }
+
+    /*
+    //Funcion para agregar pedido
+    */ 
+    public function agregarPedido()
+    {
+        // $this->pedidosComprasModel->agregarPedido();
+        // $this->index();
+    }
+
     public function generarInformePedido($id_pedido_compra)
     {
         require('libraries/fpdf/fpdf.php');
@@ -53,7 +72,7 @@ class PedidosCompras extends Controller
 
         // ========== ENCABEZADO ==========
         // Logo
-        $pdf->Image('assets/img/logo-syscovent.png', 15, 12, 25, 25);
+        $pdf->Image('assets/img/logo-syscovent.png', 15, 6, 28, 28 );
 
         // Información de la empresa
         $pdf->SetFont('Times', 'B', 16);

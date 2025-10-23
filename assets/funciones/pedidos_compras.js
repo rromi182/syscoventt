@@ -53,6 +53,11 @@ document.addEventListener("DOMContentLoaded", function () {
    // initModalEvents();
 });
 
+function frmAgregarPedido() {
+    // Redirigir a la página de agregar pedido
+    window.location.href = BASE_URL + "PedidosCompras/agregar";
+}
+
 /*
 //Funcion para generar Informe
 */
@@ -60,12 +65,12 @@ function generarInformePedido(id_pedido_compra) {
 
     const ruta = BASE_URL + "PedidosCompras/generarInformePedido/"+ id_pedido_compra;//Prueba despues poner el id del pedido correspondiente    
     // Abrir en nueva ventana y luego imprimir
-    const abrir = window.open(ruta, '_blank');
-    
+    //const abrir = window.open(ruta, '_blank');
+    window.open(ruta, '_blank');
     // Esperar a que cargue la ventana y luego imprimir
-    abrir.onload = function() {
-        abrir.print();
-        // Opcional: cerrar después de imprimir
-        abrir.onafterprint = function() { abrir.close(); };
-    };
+    // abrir.onload = function() {
+    //     abrir.print();
+    //     // Opcional: cerrar después de imprimir
+    //     abrir.onafterprint = function() { abrir.close(); };
+    // };
 }

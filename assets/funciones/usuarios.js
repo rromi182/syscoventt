@@ -469,6 +469,13 @@ function initModalEvents() {
         width: '100%'
     });
 
+    $('#id_articulo').select2({
+        theme: 'bootstrap-5',
+        placeholder: 'Seleccionar articulo',
+        allowClear: true,
+        width: '100%'
+    });
+
     // Toggle para mostrar/ocultar contraseña
     $('#togglePassword').click(function () {
         togglePasswordVisibility('#password', $(this));
